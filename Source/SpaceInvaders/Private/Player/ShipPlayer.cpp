@@ -3,12 +3,14 @@
 
 #include "Player/ShipPlayer.h"
 
-#include "Projectile.h"
-#include "Player/ShipController.h"
+#include "SpaceInvadersGameInstance.h"
+#include "Blueprint/UserWidget.h"
+#include "Components/AudioComponent.h"
+#include "Projectiles/Projectile.h"
 #include "GameFramework/FloatingPawnMovement.h"
-#include "GameFramework/PlayerState.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/ShipController.h"
 #include "UI/HUDManager.h"
-#include "UI/PlayerHUD.h"
 
 AShipPlayer::AShipPlayer()
 {
@@ -16,6 +18,23 @@ AShipPlayer::AShipPlayer()
 	PlayerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	PlayerMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Movement"));
 	PlayerMesh->SetCollisionProfileName("Player");
+	SetRootComponent(PlayerMesh);
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> Mesh(TEXT("/Game/SpaceInvaders/Art/3D/Ship"));
+	if (Mesh.Succeeded())
+		PlayerMesh->SetStaticMesh(Mesh.Object);
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> PauseMenu(TEXT("/Game/SpaceInvaders/UI/W_PauseMenu"));
+	if (PauseMenu.Succeeded())
+		PauseMenuClass = PauseMenu.Class;
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> PlayerFireObj(TEXT("/Game/SpaceInvaders/Audio/A_PlayerFire"));
+	if (PlayerFireObj.Succeeded())
+		FireSound = PlayerFireObj.Object;
+
+
+	PlayerMovement->SetPlaneConstraintEnabled(true);
+	PlayerMovement->SetPlaneConstraintAxisSetting(EPlaneConstraintAxisSetting::X);
 }
 
 void AShipPlayer::BeginPlay()
@@ -55,6 +74,10 @@ void AShipPlayer::Fire()
 		Projectile->SetDirection(Direction);
 		Projectile->SetOwner(this);
 		Projectile->GetMesh()->SetCollisionProfileName("PlayerProjectile");
+
+		if (FireSound)
+			UGameplayStatics::PlaySound2D(GetWorld(), FireSound);
+
 		CanFire = false;
 
 		GetWorld()->GetTimerManager().SetTimer(
@@ -64,6 +87,15 @@ void AShipPlayer::Fire()
 			FireDelay,
 			false);
 	}
+}
+
+void AShipPlayer::Pause()
+{
+	if (GetWorld()->GetName() == "MainMenu") return;
+	const auto Controller = Cast<AShipController>(GetController());
+	const auto IsPaused = Controller->IsPaused();
+	Controller->SetPause(!IsPaused);
+	Cast<AHUDManager>(Controller->GetHUD())->SetShowPauseMenu(!IsPaused);
 }
 
 void AShipPlayer::Tick(float DeltaTime)
@@ -76,4 +108,5 @@ void AShipPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AShipPlayer::MoveRight);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AShipPlayer::Fire);
+	PlayerInputComponent->BindAction("Pause", IE_Pressed, this, &AShipPlayer::Pause).bExecuteWhenPaused = true;
 }

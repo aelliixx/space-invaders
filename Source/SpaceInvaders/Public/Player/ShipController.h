@@ -16,19 +16,27 @@ class SPACEINVADERS_API AShipController : public APlayerController
 {
 	GENERATED_BODY()
 
+	bool IsDead = false;
+
 	UPROPERTY(VisibleAnywhere, Category=Health, meta = (AllowPrivateAccess = "true"))
 	UHealthModule* Health;
 
 	UPROPERTY(VisibleAnywhere)
 	UScoreModule* Score;
 
+	FName PlayerName;
+
 	void OnDeath(AActor*, AActor*);
+	void OnLowerBoundReached();
 
 public:
 	AShipController();
 	virtual void BeginPlay() override;
 	UHealthModule* GetHealthModule() const;
 	UScoreModule* GetScoreModule() const;
+	void SetPlayerName(FName);
+	FName GetPlayerName() const;
+	void ShowMouseCursor(const bool);
 
 	FOnScoreChangedSignature OnScoreChangedDelegate;
 	FOnHealthChangedSignature OnHealthChangedDelegate;

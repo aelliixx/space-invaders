@@ -3,59 +3,127 @@
 
 #include "AI/EnemyGrid.h"
 #include "DrawDebugHelpers.h"
-#include "Components/BillboardComponent.h"
+#include "SpaceInvadersGameState.h"
 
 
-// Sets default values
-AEnemyGrid::AEnemyGrid()
+void AEnemyGrid::InitialiseGrid()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-	PrimaryActorTick.TickInterval = 1;
-
-	Root = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
-}
-
-// Called when the game starts or when spawned
-void AEnemyGrid::BeginPlay()
-{
-	Super::BeginPlay();
-	Width = ColumnSize * EnemySize.Y;
-	double RowPosition = EnemySize.Y / 2;
-	for (int32 Row = 0; Row < SpawnList.Num(); ++Row)
+	GridWidth = Grid.ColumnSize * Grid.EnemySize.Y;
+	double RowPosition = Grid.EnemySize.Y / 2;
+	for (int32 Row = 0; Row < Grid.SpawnList.Num(); ++Row)
 	{
 		// Center the aliens on screen 
-		double ColPosition = (2 * GetActorLocation().Y - EnemySize.X * ColumnSize + EnemySize.X) / 2;
-		for (int32 Col = 0; Col < ColumnSize; ++Col)
+		double ColPosition = (2 * GetActorLocation().Y - Grid.EnemySize.X * Grid.ColumnSize + Grid.EnemySize.X) / 2;
+		for (int32 Col = 0; Col < Grid.ColumnSize; ++Col)
 		{
 			FVector Position = FVector{RowPosition, ColPosition, 0} + GetActorLocation();
-			ColPosition += EnemySize.X;
-			if (!SpawnList[Row])
+			ColPosition += Grid.EnemySize.X;
+			if (!Grid.SpawnList[Row])
 				continue;
-			auto Enemy = GetWorld()->SpawnActor<AAlien>(SpawnList[Row], Position, FRotator::ZeroRotator);
+			auto Enemy = GetWorld()->SpawnActor<AAlien>(Grid.SpawnList[Row], Position, FRotator::ZeroRotator);
 			Enemy->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 			AliveEnemies.Add(Enemy);
 		}
-		RowPosition += EnemySize.Y;
+		RowPosition += Grid.EnemySize.Y;
 	}
 }
 
-// Called every frame
-void AEnemyGrid::Tick(float DeltaTime)
+void AEnemyGrid::ResetGrid()
 {
-	Super::Tick(DeltaTime);
-	const FVector AddMovement{MovementSpeed.X * DeltaTime, MovementSpeed.Y * DeltaTime, 0.0};
+	if (!GridData) return;
+	SetActorLocation(OriginalLocation);
+	AliveEnemies.Empty();
+	if (const auto NewGrid = GridData->FindRow<FGridLayout>(FName{FString::FromInt(CurrentLevel)},
+	                                                        FString::FromInt(CurrentLevel)))
+	{
+		Grid = *NewGrid;
+		InitialiseGrid();
+	}
+}
+
+void AEnemyGrid::MoveGrid()
+{
+	const FVector AddMovement{Grid.MovementSpeed.X, Grid.MovementSpeed.Y, 0.0};
 	SetActorLocation(GetActorLocation() + AddMovement);
 
-	if (GetActorLocation().Y + Width / 2 >= SideBounds.Y)
+	if (GetActorLocation().Y + GridWidth / 2 >= Grid.SideBounds.Y)
 	{
-		const FVector NewLocation{GetActorLocation().X + WrapXDisplacement, SideBounds.X + Width / 2, 0.0};
+		const FVector NewLocation{
+			GetActorLocation().X + Grid.WrapXDisplacement, Grid.SideBounds.X + GridWidth / 2, 0.0
+		};
 		SetActorLocation(NewLocation);
 	}
 
-	if (GetActorLocation().X<= LowerBound)
+	for (const auto Enemy : AliveEnemies)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Orange, TEXT("YOU LOST!"));
-		PrimaryActorTick.UnRegisterTickFunction();
+		if (Enemy)
+			Enemy->SwapMesh();
+	}
+
+	if (GetActorLocation().X <= Grid.LowerBound)
+	{
+		Cast<ASpaceInvadersGameState>(GetWorld()->GetGameState())->OnLowerBoundReachedDelegate.Broadcast();
+		GetWorld()->GetTimerManager().ClearTimer(MoveLoop);
+	}
+}
+
+bool AEnemyGrid::AreAnyAlive() const
+{
+	for (const auto& Enemy : AliveEnemies)
+	{
+		if (Enemy && !Enemy->GetHealthModule()->IsDead())
+			return true;
+	}
+	return false;
+}
+
+AEnemyGrid::AEnemyGrid()
+{
+	PrimaryActorTick.bCanEverTick = true;
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
+}
+
+void AEnemyGrid::BeginPlay()
+{
+	Super::BeginPlay();
+	OriginalLocation = GetActorLocation();
+	ResetGrid();
+	GetWorld()->GetTimerManager().SetTimer(MoveLoop, this, &AEnemyGrid::MoveGrid, 1.0f, true);
+}
+
+void AEnemyGrid::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+}
+
+void AEnemyGrid::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	if (!AreAnyAlive())
+	{
+		int Null = 0;
+		int Dead = 0;
+		for (const auto& Enemy : AliveEnemies)
+		{
+			if (!Enemy)
+			{
+				Null++;
+				continue;
+			}
+			if (Enemy->GetHealthModule()->IsDead())
+			{
+				Dead++;
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Dead enemy: ") +
+										 FString::FromInt(Enemy->GetHealthModule()->GetCurrentHealth()));
+				continue;
+			}
+		}
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("No enemies alive. Enemy count: ") +
+								 FString::FromInt(AliveEnemies.Num()));
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Null: ") + FString::FromInt(Null));
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Dead: ") + FString::FromInt(Dead));
+		++CurrentLevel %= GridData->GetRowNames().Num() + 1;
+		ResetGrid();
 	}
 }

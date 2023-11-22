@@ -6,15 +6,10 @@
 #include "AI/Alien.h"
 #include "Octopus.generated.h"
 
-/**
- * 
- */
 UCLASS()
-class SPACEINVADERS_API AOctopus : public AAlien
+class SPACEINVADERS_API AOctopus final : public AAlien
 {
 	GENERATED_BODY()
-	
-	
-	
-	
+
+	AOctopus();
 };

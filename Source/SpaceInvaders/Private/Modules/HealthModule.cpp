@@ -15,7 +15,7 @@ void UHealthModule::OnDeath(AActor* Source)
 
 UHealthModule::UHealthModule()
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
 
@@ -25,14 +25,9 @@ void UHealthModule::BeginPlay()
 }
 
 
-void UHealthModule::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-}
-
 void UHealthModule::DoDamage(const float HitPoints, AActor* Source)
 {
-	CurrentHP = FMath::Max(0, CurrentHP - HitPoints);
+	CurrentHP = FMath::Clamp(CurrentHP - HitPoints, 0, MaxHP);
 	if (const AShipController* PlayerController = Cast<AShipController>(GetOwner()))
 		PlayerController->OnHealthChangedDelegate.Broadcast(CurrentHP);
 
@@ -54,4 +49,14 @@ float UHealthModule::GetCurrentHealth() const
 float UHealthModule::GetMaxHP() const
 {
 	return MaxHP;
+}
+
+void UHealthModule::ResetHealth()
+{
+	CurrentHP = MaxHP;
+}
+
+bool UHealthModule::IsDead() const
+{
+	return CurrentHP <= 0;
 }

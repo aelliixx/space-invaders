@@ -3,10 +3,11 @@
 
 #include "AI/Alien.h"
 
-#include "Projectile.h"
+#include "Projectiles/Projectile.h"
 #include "Materials/MaterialInstanceConstant.h"
 #include "Player/ShipController.h"
 #include "Player/ShipPlayer.h"
+#include "Projectiles/Powerups/HealthPowerup.h"
 
 
 // Sets default values
@@ -16,11 +17,12 @@ AAlien::AAlien()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	SetRootComponent(Mesh);
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> Alien1(TEXT("/Game/SpaceInvaders/Art/3D/Alien1.Alien1"));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> Alien2(TEXT("/Game/SpaceInvaders/Art/3D/Alien2.Alien2"));
-	Mesh->SetStaticMesh(Alien1.Object);
 	NormalMesh = Alien1.Object;
 	AlternateMesh = Alien2.Object;
+	Mesh->SetStaticMesh(NormalMesh);
 	static ConstructorHelpers::FObjectFinder<UMaterialInstanceConstant> RocketMaterialInstance(
 		TEXT("/Game/SpaceInvaders/Art/Materials/MI_Red.MI_Red"));
 	RocketMaterial = RocketMaterialInstance.Object;
@@ -66,13 +68,6 @@ void AAlien::BeginPlay()
 		FMath::RandRange(FireInterval.X, FireInterval.Y),
 		true);
 
-	GetWorld()->GetTimerManager().SetTimer(
-		MeshAnimationHandle,
-		this,
-		&AAlien::SwapMesh,
-		1,
-		true);
-
 	Health->FOnDeathDelegate.AddLambda([this](AActor* It, AActor* Source)
 	{
 		if (It == this && Source)
@@ -86,6 +81,16 @@ void AAlien::BeginPlay()
 
 void AAlien::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	if (FMath::FRand() <= ChanceToDropPowerup)
+	{
+		if (const auto Powerup = GetWorld()->SpawnActor<AHealthPowerup>(AHealthPowerup::StaticClass(), GetActorLocation(),
+		                                                          FRotator::ZeroRotator))
+		{
+			const FRotator YawRotation(0, GetActorRotation().Yaw, 0);
+			const FVector Direction = -FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+			Powerup->SetDirection(Direction, 100);
+		}
+	}
 	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 	Super::EndPlay(EndPlayReason);
 }

@@ -13,22 +13,22 @@ class SPACEINVADERS_API AAlien : public AActor
 	GENERATED_BODY()
 
 	FTimerHandle FireHandle;
-	FTimerHandle MeshAnimationHandle;
 
 	UPROPERTY()
 	UMaterialInterface* RocketMaterial;
 
+	
+	void Fire();
+
+	uint8 CurrentMeshIndex;
+	float ChanceToDropPowerup = 1.0f;
+
+protected:
 	UPROPERTY()
 	TObjectPtr<UStaticMesh> NormalMesh;
 	UPROPERTY()
 	TObjectPtr<UStaticMesh> AlternateMesh;
 	
-	void Fire();
-
-	uint8 CurrentMeshIndex;
-	void SwapMesh();
-
-protected:
 	UPROPERTY()
 	UHealthModule* Health;
 
@@ -50,4 +50,5 @@ public:
 
 	UHealthModule* GetHealthModule() const;
 	int64 GetPointWorth() const;
+	void SwapMesh();
 };

@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameFramework/FloatingPawnMovement.h"
 #include "GameFramework/Pawn.h"
+#include "UI/PauseMenu.h"
 #include "ShipPlayer.generated.h"
 
 UCLASS()
@@ -14,15 +16,19 @@ class SPACEINVADERS_API AShipPlayer : public APawn
 	FTimerHandle FireDelayHandle;
 	bool CanFire = true;
 
+	TSubclassOf<UPauseMenu> PauseMenuClass;
+
+	UPROPERTY()
+	TObjectPtr<USoundBase> FireSound;
 
 public:
 	// Sets default values for this pawn's properties
 	AShipPlayer();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Mesh, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* PlayerMesh;
+	TObjectPtr<UStaticMeshComponent> PlayerMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Movement, meta = (AllowPrivateAccess = "true"))
-	class UFloatingPawnMovement* PlayerMovement;
+	TObjectPtr<UFloatingPawnMovement> PlayerMovement;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Shooting)
 	float FireDelay = 0.5f;
@@ -37,6 +43,9 @@ protected:
 
 	void MoveRight(const float);
 	void Fire();
+
+	UFUNCTION()
+	void Pause();
 
 public:
 	// Called every frame

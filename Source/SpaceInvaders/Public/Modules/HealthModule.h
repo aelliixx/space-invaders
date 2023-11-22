@@ -17,13 +17,13 @@ class SPACEINVADERS_API UHealthModule final : public UActorComponent
 
 public:
 	UHealthModule();
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 	void DoDamage(float, AActor* = nullptr);
 	void SetMaxHP(float);
 	float GetCurrentHealth() const;
 	float GetMaxHP() const;
+	void ResetHealth();
+	bool IsDead() const;
 
 	FOnDeathSignature FOnDeathDelegate;
 

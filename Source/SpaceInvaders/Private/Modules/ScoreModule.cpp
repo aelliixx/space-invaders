@@ -12,6 +12,11 @@ int64 UScoreModule::GetScore() const
 	return Score;
 }
 
+void UScoreModule::ResetScore()
+{
+	Score = 0;
+}
+
 void UScoreModule::BeginPlay()
 {
 	Super::BeginPlay();

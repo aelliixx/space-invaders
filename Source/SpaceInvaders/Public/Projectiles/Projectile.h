@@ -32,9 +32,10 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-	void SetDirection(const FVector& Direction);
+	void SetDirection(const FVector& Direction, float NewVelocity = 500);
+
 	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent,
+	virtual void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent,
 	           FVector NormalImpulse, const FHitResult& Hit);
 
 	UStaticMeshComponent* GetMesh() const;

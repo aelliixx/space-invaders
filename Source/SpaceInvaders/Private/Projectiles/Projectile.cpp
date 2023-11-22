@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Projectile.h"
+#include "Projectiles/Projectile.h"
 
 #include "AI/Alien.h"
 #include "Player/ShipController.h"
@@ -14,7 +14,7 @@ AProjectile::AProjectile()
 	PrimaryActorTick.bCanEverTick = true;
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	Movement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Movement"));
-
+	SetRootComponent(Mesh);
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> Projectile(TEXT("/Game/SpaceInvaders/Art/3D/Rocket.Rocket"));
 	Mesh->SetStaticMesh(Projectile.Object);
 
@@ -43,8 +43,9 @@ void AProjectile::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AProjectile::SetDirection(const FVector& Direction)
+void AProjectile::SetDirection(const FVector& Direction, float NewVelocity)
 {
+	Velocity = NewVelocity;
 	Movement->Velocity = Direction * Velocity;
 }
 
@@ -62,7 +63,7 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 			FMath::RandRange(Damage.X, Damage.Y), GetOwner());
 		Destroy();
 	}
-	else if (dynamic_cast<AProjectile*>(OtherActor))
+	else if (OtherActor->IsA(AProjectile::StaticClass()))
 	{
 		Destroy();
 		OtherActor->Destroy();

@@ -10,6 +10,8 @@ void UPlayerHUD::NativeConstruct()
 
 void UPlayerHUD::Update()
 {
-	HealthBar->Update();
-	ScoreText->Update();
+	if (HealthBar)
+		HealthBar->Update();
+	if (ScoreText)
+		ScoreText->Update();
 }

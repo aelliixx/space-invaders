@@ -19,6 +19,7 @@ public:
 
 	void AddScore(const int64);
 	int64 GetScore() const;
+	void ResetScore();
 
 protected:
 	virtual void BeginPlay() override;
