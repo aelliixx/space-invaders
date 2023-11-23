@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// 2023, Donatas Mockus, https://github.com/aelliixx/space-invaders
 
 
 #include "UI/DeathScreen.h"
@@ -8,7 +8,6 @@
 
 void UDeathScreen::OnRestart()
 {
-	GEngine->AddOnScreenDebugMessage(static_cast<uint64>(-1), 5, FColor::Orange, TEXT("Restart!"));
 	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
 }
 

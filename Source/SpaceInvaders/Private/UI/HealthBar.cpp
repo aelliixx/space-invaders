@@ -1,14 +1,23 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// 2023, Donatas Mockus, https://github.com/aelliixx/space-invaders
 
 
 #include "UI/HealthBar.h"
 
 #include "Components/ProgressBar.h"
+#include "Player/ShipController.h"
 #include "UI/HUDManager.h"
 
 
-void UHealthBar::Update()
+void UHealthBar::SetHealth(const float Health)
 {
-	const auto HUD = Cast<AHUDManager>(GetOwningPlayer()->GetHUD());
-	Bar->SetPercent(HUD->GetPlayerHP() / HUD->GetPlayerMaxHP());
+	Bar->SetPercent(Health / MaxHP);
+}
+
+void UHealthBar::NativeConstruct()
+{
+	Super::NativeConstruct();
+	const auto Controller = Cast<AShipController>(GetOwningPlayer());
+	Controller->OnHealthChangedDelegate.AddUObject(this, &UHealthBar::SetHealth);
+	MaxHP = Controller->GetHealthModule()->GetMaxHP();
+	Bar->SetPercent(Controller->GetHealthModule()->GetCurrentHealth() / MaxHP);
 }

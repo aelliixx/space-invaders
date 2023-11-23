@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// 2023, Donatas Mockus, https://github.com/aelliixx/space-invaders
 
 
 #include "AI/Octopus.h"
@@ -14,6 +14,7 @@ AOctopus::AOctopus()
 	
 	PointWorth = 20;
 	FireInterval = {5, 30};
+	ChanceToDropPowerup = 0.1f;
 
 	Health->SetMaxHP(15);
 }

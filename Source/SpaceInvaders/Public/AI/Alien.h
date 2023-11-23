@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// 2023, Donatas Mockus, https://github.com/aelliixx/space-invaders
 
 #pragma once
 
@@ -21,7 +21,6 @@ class SPACEINVADERS_API AAlien : public AActor
 	void Fire();
 
 	uint8 CurrentMeshIndex;
-	float ChanceToDropPowerup = 1.0f;
 
 protected:
 	UPROPERTY()
@@ -32,6 +31,7 @@ protected:
 	UPROPERTY()
 	UHealthModule* Health;
 
+
 	UPROPERTY()
 	UStaticMeshComponent* Mesh;
 
@@ -41,8 +41,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category=Stats)
 	FVector2f FireInterval = {10, 20}; // How often the alien fires its weapons
 
+	UPROPERTY(EditDefaultsOnly, Category=Stats)
+	float ChanceToDropPowerup = 0.05f;
+	
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type) override;
+	virtual void OnDeath(AActor* Source);
 
 public:
 	AAlien();

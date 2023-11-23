@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// 2023, Donatas Mockus, https://github.com/aelliixx/space-invaders
 
 #pragma once
 
@@ -17,8 +17,9 @@ class SPACEINVADERS_API UHealthBar : public UUserWidget
 	UPROPERTY(meta=(BindWidget))
 	class UProgressBar* Bar;
 
-public:
-	void Update();
-	
-	
+	float MaxHP;
+
+	UFUNCTION()
+	void SetHealth(const float Health);
+	virtual void NativeConstruct() override;
 };

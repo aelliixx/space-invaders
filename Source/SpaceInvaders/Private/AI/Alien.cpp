@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// 2023, Donatas Mockus, https://github.com/aelliixx/space-invaders
 
 
 #include "AI/Alien.h"
@@ -44,6 +44,7 @@ void AAlien::Fire()
 		const FRotator YawRotation(0, GetActorRotation().Yaw, 0);
 		const FVector Direction = -FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		Projectile->SetDirection(Direction);
+		Projectile->SetDamageRange({20, 30});
 		Projectile->SetOwner(this);
 		Projectile->GetMesh()->SetCollisionProfileName("EnemyProjectile");
 		Projectile->GetMesh()->SetMaterial(0, RocketMaterial);
@@ -70,29 +71,33 @@ void AAlien::BeginPlay()
 
 	Health->FOnDeathDelegate.AddLambda([this](AActor* It, AActor* Source)
 	{
-		if (It == this && Source)
-		{
-			const auto Player = Cast<AShipPlayer>(Source);
-			Cast<AShipController>(Player->GetController())->GetScoreModule()->AddScore(PointWorth);
-			Destroy();
-		}
+		if (It == this && Source && IsValid(Source))
+			OnDeath(Source);
 	});
 }
 
 void AAlien::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+	Super::EndPlay(EndPlayReason);
+}
+
+void AAlien::OnDeath(AActor* Source)
+{
+	const auto Player = Cast<AShipPlayer>(Source);
+	Cast<AShipController>(Player->GetController())->GetScoreModule()->AddScore(PointWorth);
 	if (FMath::FRand() <= ChanceToDropPowerup)
 	{
-		if (const auto Powerup = GetWorld()->SpawnActor<AHealthPowerup>(AHealthPowerup::StaticClass(), GetActorLocation(),
-		                                                          FRotator::ZeroRotator))
+		if (const auto Powerup = GetWorld()->SpawnActor<AHealthPowerup>(AHealthPowerup::StaticClass(),
+		                                                                GetActorLocation(),
+		                                                                FRotator::ZeroRotator))
 		{
 			const FRotator YawRotation(0, GetActorRotation().Yaw, 0);
 			const FVector Direction = -FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 			Powerup->SetDirection(Direction, 100);
 		}
 	}
-	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
-	Super::EndPlay(EndPlayReason);
+	Destroy();
 }
 
 // Called every frame

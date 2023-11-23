@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// 2023, Donatas Mockus, https://github.com/aelliixx/space-invaders
 
 #pragma once
 
@@ -24,9 +24,6 @@ class SPACEINVADERS_API USpaceInvadersGameInstance : public UGameInstance
 
 	FName PlayerName;
 
-	// Settings
-	bool SoundEnabled = true;
-	
 public:
 	void SaveLeaderboard(const FLeaderboard&);
 	TObjectPtr<ULeaderboardSaveGame> LoadLeaderboard() const;
@@ -34,5 +31,4 @@ public:
 
 	void SetPlayerName(const FName&);
 	FName GetPlayerName() const;
-	bool GetSoundEnabled() const;
 };

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// 2023, Donatas Mockus, https://github.com/aelliixx/space-invaders
 
 #pragma once
 
@@ -11,7 +11,7 @@ class SPACEINVADERS_API AHealthPowerup final : public APowerup
 {
 	GENERATED_BODY()
 
-	float HealthAmount = 50;
+	float HealthAmount = 5;
 
 	virtual void ApplyPowerup(AShipPlayer* Player) override;
 

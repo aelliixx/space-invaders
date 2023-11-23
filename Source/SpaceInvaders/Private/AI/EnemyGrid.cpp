@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// 2023, Donatas Mockus, https://github.com/aelliixx/space-invaders
 
 
 #include "AI/EnemyGrid.h"
@@ -102,27 +102,6 @@ void AEnemyGrid::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (!AreAnyAlive())
 	{
-		int Null = 0;
-		int Dead = 0;
-		for (const auto& Enemy : AliveEnemies)
-		{
-			if (!Enemy)
-			{
-				Null++;
-				continue;
-			}
-			if (Enemy->GetHealthModule()->IsDead())
-			{
-				Dead++;
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Dead enemy: ") +
-										 FString::FromInt(Enemy->GetHealthModule()->GetCurrentHealth()));
-				continue;
-			}
-		}
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("No enemies alive. Enemy count: ") +
-								 FString::FromInt(AliveEnemies.Num()));
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Null: ") + FString::FromInt(Null));
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Dead: ") + FString::FromInt(Dead));
 		++CurrentLevel %= GridData->GetRowNames().Num() + 1;
 		ResetGrid();
 	}

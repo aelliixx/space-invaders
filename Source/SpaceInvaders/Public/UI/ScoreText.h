@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// 2023, Donatas Mockus, https://github.com/aelliixx/space-invaders
 
 #pragma once
 
@@ -14,6 +14,7 @@ class SPACEINVADERS_API UScoreText : public UUserWidget
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* ScoreText;
 
-public:
-	void Update();
+	UFUNCTION()
+	void SetScore(const int64 Score);
+	virtual void NativeConstruct() override;
 };

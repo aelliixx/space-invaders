@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// 2023, Donatas Mockus, https://github.com/aelliixx/space-invaders
 
 
 #include "SpaceInvadersGameInstance.h"
@@ -45,9 +45,4 @@ void USpaceInvadersGameInstance::SetPlayerName(const FName& Name)
 FName USpaceInvadersGameInstance::GetPlayerName() const
 {
 	return PlayerName;
-}
-
-bool USpaceInvadersGameInstance::GetSoundEnabled() const
-{
-	return SoundEnabled;
 }

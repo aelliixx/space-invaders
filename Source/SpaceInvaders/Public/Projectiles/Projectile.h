@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// 2023, Donatas Mockus, https://github.com/aelliixx/space-invaders
 
 #pragma once
 
@@ -33,6 +33,7 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 	void SetDirection(const FVector& Direction, float NewVelocity = 500);
+	void SetDamageRange(const FVector2f& NewDamage);
 
 	UFUNCTION()
 	virtual void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent,

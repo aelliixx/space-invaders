@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// 2023, Donatas Mockus, https://github.com/aelliixx/space-invaders
 
 
 #include "UI/HUDManager.h"
@@ -23,13 +23,6 @@ AHUDManager::AHUDManager() : HUD(nullptr)
 	PauseMenuClass = PauseMenu.Class;
 }
 
-void AHUDManager::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-	if (HUD)
-		HUD->Update();
-}
-
 void AHUDManager::BeginPlay()
 {
 	Super::BeginPlay();
@@ -45,48 +38,11 @@ void AHUDManager::BeginPlay()
 		return;
 	}
 
-	Controller->OnHealthChangedDelegate.AddUObject(
-		this, &AHUDManager::SetPlayerHP);
-	Controller->OnScoreChangedDelegate.AddUObject(
-		this, &AHUDManager::SetPlayerScore);
-
-	PlayerMaxHP = Controller->GetHealthModule()->GetMaxHP();
-	PlayerHP = Controller->GetHealthModule()->GetCurrentHealth();
 	Controller->ShowMouseCursor(false);
 	SetShowHUD(true);
 }
 
-void AHUDManager::SetPlayerHP(const float Value)
-{
-	PlayerHP = Value;
-}
-
-void AHUDManager::SetPlayerMaxHP(const float Value)
-{
-	PlayerMaxHP = Value;
-}
-
-void AHUDManager::SetPlayerScore(const int64 Value)
-{
-	Score = Value;
-}
-
-float AHUDManager::GetPlayerHP() const
-{
-	return PlayerHP;
-}
-
-float AHUDManager::GetPlayerMaxHP() const
-{
-	return PlayerMaxHP;
-}
-
-int64 AHUDManager::GetPlayerScore() const
-{
-	return Score;
-}
-
-UDeathScreen* AHUDManager::GetDeathScreen() const
+TObjectPtr<UDeathScreen> AHUDManager::GetDeathScreen() const
 {
 	return DeathScreen;
 }
@@ -132,10 +88,12 @@ void AHUDManager::SetShowPauseMenu(const bool Show)
 			PauseMenu->AddToViewport();
 		PauseMenu->SetScore(Controller->GetScoreModule()->GetScore());
 		Controller->ShowMouseCursor(true);
+		SetShowHUD(false);
 		return;
 	}
 	if (PauseMenu)
 		PauseMenu->RemoveFromParent();
 	Controller->ShowMouseCursor(false);
+	SetShowHUD(true);
 	PauseMenu = nullptr;
 }

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// 2023, Donatas Mockus, https://github.com/aelliixx/space-invaders
 
 #pragma once
 
@@ -30,23 +30,11 @@ class SPACEINVADERS_API AHUDManager : public AHUD
 	TSubclassOf<UMainMenu> MainMenuClass;
 	TSubclassOf<UPauseMenu> PauseMenuClass;
 
-	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
 	
-	float PlayerHP{};
-	float PlayerMaxHP{};
-	int64 Score{};
-
-	void SetPlayerHP(const float);
-	void SetPlayerMaxHP(const float);
-	void SetPlayerScore(const int64);
 public:
 
-	float GetPlayerHP() const;
-	float GetPlayerMaxHP() const;
-	int64 GetPlayerScore() const;
-
-	UDeathScreen* GetDeathScreen() const;
+	TObjectPtr<UDeathScreen> GetDeathScreen() const;
 
 	void SetShowHUD(const bool);
 	void SetShowDeathScreen(const bool);

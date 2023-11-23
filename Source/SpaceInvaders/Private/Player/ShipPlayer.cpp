@@ -1,11 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// 2023, Donatas Mockus, https://github.com/aelliixx/space-invaders
 
 
 #include "Player/ShipPlayer.h"
 
-#include "SpaceInvadersGameInstance.h"
 #include "Blueprint/UserWidget.h"
-#include "Components/AudioComponent.h"
 #include "Projectiles/Projectile.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Kismet/GameplayStatics.h"
