@@ -5,12 +5,14 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Player/ShipController.h"
+#include "UI/HUDManager.h"
 
 void UPauseMenu::OnResumeClicked()
 {
 	GetOwningPlayer()->SetPause(false);
-	Cast<AShipController>(GetOwningPlayer())->ShowMouseCursor(false);
-	RemoveFromParent();
+	const auto HUDManager = Cast<AHUDManager>(GetOwningPlayer()->GetHUD());
+	HUDManager->SetShowHUD(true);
+	HUDManager->SetShowPauseMenu(false);
 }
 
 void UPauseMenu::OnQuitClicked()
