@@ -90,10 +90,10 @@ void AShipPlayer::Fire()
 void AShipPlayer::Pause()
 {
 	if (GetWorld()->GetName() == "MainMenu") return;
-	const auto Controller = Cast<AShipController>(GetController());
-	const auto IsPaused = Controller->IsPaused();
-	Controller->SetPause(!IsPaused);
-	Cast<AHUDManager>(Controller->GetHUD())->SetShowPauseMenu(!IsPaused);
+	const auto PlayerController = Cast<AShipController>(GetController());
+	const auto IsPaused = PlayerController->IsPaused();
+	PlayerController->SetPause(!IsPaused);
+	Cast<AHUDManager>(PlayerController->GetHUD())->SetShowPauseMenu(!IsPaused);
 }
 
 void AShipPlayer::Tick(float DeltaTime)

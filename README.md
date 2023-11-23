@@ -95,6 +95,10 @@ game logic to update it.
 I would've liked to created reusable widgets for common elements (such as buttons, text blocks and fields, etc.) that defined their style. This would've reduced the workload
 for styling buttons and text blocks.
 
+- A better looking health-bar
+
+- More sounds and options for turning them off
+
 ## Full feature set
 
 - Two alien types: crab and octopus

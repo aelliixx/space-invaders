@@ -12,15 +12,15 @@
 AHUDManager::AHUDManager() : HUD(nullptr)
 {
 	PrimaryActorTick.TickInterval = 0.1f;
-	static ConstructorHelpers::FClassFinder<UPlayerHUD> Hud(TEXT("/Game/SpaceInvaders/UI/W_PlayerHUD"));
-	static ConstructorHelpers::FClassFinder<UDeathScreen> DeathScreen(TEXT("/Game/SpaceInvaders/UI/W_DeathScreen"));
-	static ConstructorHelpers::FClassFinder<UMainMenu> MainMenu(TEXT("/Game/SpaceInvaders/UI/W_MainMenu"));
-	static ConstructorHelpers::FClassFinder<UPauseMenu> PauseMenu(TEXT("/Game/SpaceInvaders/UI/W_PauseMenu"));
+	static ConstructorHelpers::FClassFinder<UPlayerHUD> HudWidget(TEXT("/Game/SpaceInvaders/UI/W_PlayerHUD"));
+	static ConstructorHelpers::FClassFinder<UDeathScreen> DeathScreenWidget(TEXT("/Game/SpaceInvaders/UI/W_DeathScreen"));
+	static ConstructorHelpers::FClassFinder<UMainMenu> MainMenuWidget(TEXT("/Game/SpaceInvaders/UI/W_MainMenu"));
+	static ConstructorHelpers::FClassFinder<UPauseMenu> PauseMenuWidget(TEXT("/Game/SpaceInvaders/UI/W_PauseMenu"));
 
-	PlayerHudClass = Hud.Class;
-	DeathScreenClass = DeathScreen.Class;
-	MainMenuClass = MainMenu.Class;
-	PauseMenuClass = PauseMenu.Class;
+	PlayerHudClass = HudWidget.Class;
+	DeathScreenClass = DeathScreenWidget.Class;
+	MainMenuClass = MainMenuWidget.Class;
+	PauseMenuClass = PauseMenuWidget.Class;
 }
 
 void AHUDManager::BeginPlay()
