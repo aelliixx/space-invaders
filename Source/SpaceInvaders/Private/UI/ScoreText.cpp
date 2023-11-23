@@ -16,5 +16,7 @@ void UScoreText::SetScore(const int64 Score)
 void UScoreText::NativeConstruct()
 {
 	Super::NativeConstruct();
-	Cast<AShipController>(GetOwningPlayer())->OnScoreChangedDelegate.AddUObject(this, &UScoreText::SetScore);
+	const auto Controller = Cast<AShipController>(GetOwningPlayer());
+	Controller->OnScoreChangedDelegate.AddUObject(this, &UScoreText::SetScore);
+	SetScore(Controller->GetScoreModule()->GetScore());
 }
